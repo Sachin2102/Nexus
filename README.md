@@ -96,7 +96,7 @@ Each agent has:
 ### Smart Inbox — AI Email Triage
 > Every email classified by priority and category, summarised in one line, and drafted for reply. The selected email shows an 89%-confidence AI draft the executive can approve with one click.
 
-<img src="docs/inbox.png" width="800" alt="NEXUS Smart Inbox with AI email triage and draft replies" />
+<img src="docs/inbox2.png" width="800" alt="NEXUS Smart Inbox with AI email triage and draft replies" />
 
 ---
 
