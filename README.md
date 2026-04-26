@@ -131,11 +131,11 @@ Each agent has:
 ### Ask NEXUS — Floating AI Assistant
 > A persistent chat widget with live org context loaded. Four quick-question prompts get you instant situational awareness without typing.
 
-<img src="docs/chat.png" width="100%" alt="Ask NEXUS floating chat widget with quick question suggestions" />
+<img src="docs/chat3.png" width="100%" alt="Ask NEXUS floating chat widget with quick question suggestions" />
 
 > In conversation: NEXUS cross-references emails, projects, and decisions to give a prioritised answer — not a generic one.
 
-<img src="docs/chat2.png" width="100%" alt="Ask NEXUS AI response — cross-referencing live org data to prioritise critical production outage" />
+<img src="docs/chat4.png" width="100%" alt="Ask NEXUS AI response — cross-referencing live org data to prioritise critical production outage" />
 
 ---
 
