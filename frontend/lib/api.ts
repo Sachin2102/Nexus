@@ -1,17 +1,19 @@
 // ─────────────────────────────────────────────────
 // NEXUS — API Client
+// Calls FastAPI backend directly.
+// CORS is configured on the backend for localhost:3000.
 // ─────────────────────────────────────────────────
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+export const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' })
+  const res = await fetch(`${BACKEND}${path}`, { cache: 'no-store' })
   if (!res.ok) throw new Error(`API error ${res.status}: ${path}`)
   return res.json()
 }
 
 async function post<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${BACKEND}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
@@ -20,7 +22,16 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   return res.json()
 }
 
-// ── Dashboard ─────────────────────────────────────
+async function patch<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${BACKEND}${path}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}: ${path}`)
+  return res.json()
+}
+
 export const api = {
   dashboard: {
     metrics:  () => get('/api/dashboard/metrics'),
@@ -37,29 +48,19 @@ export const api = {
   },
 
   meetings: {
-    list:          ()          => get('/api/meetings/'),
-    get:           (id: string) => get(`/api/meetings/${id}`),
-    generateBrief: (id: string) => post(`/api/meetings/${id}/generate-brief`),
+    list:          ()                          => get('/api/meetings/'),
+    get:           (id: string)                => get(`/api/meetings/${id}`),
+    generateBrief: (id: string)                => post(`/api/meetings/${id}/generate-brief`),
     postMeeting:   (id: string, notes: string) => post(`/api/meetings/${id}/post-meeting`, { notes }),
   },
 
   projects: {
-    list:   ()               => get('/api/projects/'),
-    get:    (id: string)     => get(`/api/projects/${id}`),
-    assess: (id: string)     => post(`/api/projects/${id}/assess`),
-    update: (id: string, body: object) => fetch(`${BASE}/api/projects/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    }).then(r => r.json()),
+    list:   ()                         => get('/api/projects/'),
+    get:    (id: string)               => get(`/api/projects/${id}`),
+    assess: (id: string)               => post(`/api/projects/${id}/assess`),
+    update: (id: string, body: object) => patch(`/api/projects/${id}`, body),
   },
 
   decisions: {
-    list:    (status?: string) => get(`/api/decisions/${status ? `?status=${status}` : ''}`),
-    get:     (id: string)      => get(`/api/decisions/${id}`),
-    resolve: (id: string, resolution: string) => post(`/api/decisions/${id}/resolve`, { resolution }),
-  },
-}
-
-// SWR fetcher
-export const fetcher = (url: string) => fetch(`${BASE}${url}`).then(r => r.json())
+    list:    (status?: string)                => get(`/api/decisions/${status ? `?status=${status}` : ''}`),
+    get:  

@@ -27,14 +27,27 @@ export default function DigestPage() {
   const [data, setData]       = useState<DigestData | null>(null)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied]   = useState(false)
-  const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+  const [error, setError]     = useState<string | null>(null)
 
   const generate = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const res = await fetch(`${BASE}/api/digest/generate`, { method: 'POST' })
+      const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const res  = await fetch(`${BACKEND}/api/digest/generate`, { method: 'POST' })
+      if (!res.ok) {
+        const text = await res.text()
+        setError(`Backend error ${res.status}: ${text}`)
+        return
+      }
       const json = await res.json()
+      if (!json.stats) {
+        setError('Unexpected response from backend. Check the backend terminal for errors.')
+        return
+      }
       setData(json)
+    } catch (e: any) {
+      setError('Could not reach backend. Make sure it is running on port 8000.')
     } finally {
       setLoading(false)
     }
@@ -106,8 +119,19 @@ export default function DigestPage() {
         </div>
       </div>
 
+      {/* Error state */}
+      {error && !loading && (
+        <div className="card border border-red-500/30 bg-red-500/5 p-5 flex items-start gap-3">
+          <span className="text-red-400 text-lg">⚠️</span>
+          <div>
+            <p className="text-sm font-semibold text-red-400 mb-1">Failed to generate digest</p>
+            <p className="text-xs text-slate-400">{error}</p>
+          </div>
+        </div>
+      )}
+
       {/* Empty state */}
-      {!data && !loading && (
+      {!data && !loading && !error && (
         <div className="card flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
             <FileText className="w-7 h-7 text-indigo-400" />
@@ -142,31 +166,4 @@ export default function DigestPage() {
               { icon: GitBranch,    label: 'Decisions resolved', value: data.stats.decisions_resolved },
               { icon: Zap,          label: 'Automation rate',    value: `${data.stats.automation_rate}%` },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="card p-3 text-center">
-                <Icon className="w-4 h-4 text-indigo-400 mx-auto mb-1.5" />
-                <p className="text-lg font-bold text-white">{value}</p>
-                <p className="text-[10px] text-slate-500">{label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Digest content */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-400" />
-                <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wide">AI Generated</span>
-              </div>
-              <span className="text-[10px] text-slate-600">
-                {new Date(data.generated_at).toLocaleString()}
-              </span>
-            </div>
-            <div className="space-y-0.5">
-              {renderDigest(data.digest)}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
+              <div key={label} className="card p

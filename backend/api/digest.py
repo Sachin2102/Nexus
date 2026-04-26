@@ -99,7 +99,7 @@ EMAIL STATS
 - Auto-handled (sent/archived): {len(auto_sent)} ({email_auto_pct}%)
 - Flagged for human review: {len(flagged)}
 - Flagged emails:
-{chr(10).join(f'  • [{e.priority.value}] {e.subject} — {e.sender_name}' for e in flagged[:5])}
+{chr(10).join(f'  • [{e.priority.value}] {e.subject} — {e.sender_name}' for e in flagged[:3])}
 
 MEETINGS
 - Total meetings: {len(all_meetings)}
@@ -107,21 +107,21 @@ MEETINGS
 - Upcoming: {len(upcoming_meetings)}
 - Total action items extracted: {total_action_items}
 - Completed meeting summaries:
-{chr(10).join(f'  • {m.title}: {m.summary or "No summary"}' for m in completed_meetings[:5])}
+{chr(10).join(f'  • {m.title}: {(m.summary or "No summary")[:60]}' for m in completed_meetings[:3])}
 - Next week's meetings:
-{chr(10).join(f'  • {m.title} on {m.scheduled_at.strftime("%b %d")}' for m in upcoming_meetings[:5])}
+{chr(10).join(f'  • {m.title} on {m.scheduled_at.strftime("%b %d")}' for m in upcoming_meetings[:3])}
 
 PROJECT PORTFOLIO (avg health: {avg_health}/100)
 - Healthy: {len(healthy_projs)} | At Risk: {len(at_risk_projs)} | Critical: {len(critical_projs)}
 
 Critical projects:
-{chr(10).join(f'  • {p.name} [{p.health_score}/100] — {p.ai_recommendation or "No recommendation"}' for p in critical_projs)}
+{chr(10).join(f'  • {p.name} [{p.health_score}/100] — {(p.ai_recommendation or "")[:80]}' for p in critical_projs[:3])}
 
 At-risk projects:
-{chr(10).join(f'  • {p.name} [{p.health_score}/100] — {p.ai_recommendation or "No recommendation"}' for p in at_risk_projs)}
+{chr(10).join(f'  • {p.name} [{p.health_score}/100] — {(p.ai_recommendation or "")[:80]}' for p in at_risk_projs[:3])}
 
 Healthy projects:
-{chr(10).join(f'  • {p.name} [{p.health_score}/100]' for p in healthy_projs)}
+{chr(10).join(f'  • {p.name} [{p.health_score}/100]' for p in healthy_projs[:3])}
 
 DECISION ENGINE
 - Total decisions: {len(all_decisions)}
@@ -130,37 +130,35 @@ DECISION ENGINE
 - Pending: {len(pending)}
 
 Decisions needing your attention:
-{chr(10).join(f'  • [{d.urgency.value}] {d.title} → escalated to {d.escalated_to}' for d in escalated[:5])}
+{chr(10).join(f'  • [{d.urgency.value}] {d.title} → escalated to {d.escalated_to}' for d in escalated[:3])}
 
 Recently auto-resolved:
 {chr(10).join(f'  • {d.title} → {d.resolution}' for d in ai_resolved[:3])}
 
 NEXUS ACTIVITY
 - Total autonomous actions taken: {total_events}
-- Recent actions: {chr(10).join(f'  • [{e.agent_name}] {e.title}' for e in events[:8])}
+- Recent actions: {chr(10).join(f'  • [{e.agent_name}] {e.title}' for e in events[:5])}
 """
 
-    prompt = f"""Write a weekly executive digest based on this organisational data:
+    prompt = f"""Write a concise weekly executive digest. Be brief — 3-4 sentences per section max.
 
+DATA:
 {data_summary}
 
-Structure the digest with these sections:
+Sections (keep each short):
 ## Executive Summary
-## Email Intelligence
-## Meeting Outcomes & Upcoming
-## Project Portfolio Health
-## Decision Engine
-## Key Risks This Week
-## Recommended Priorities for Next Week
+## Key Risks
+## Recommended Priorities
 
-Make it compelling, specific, and actionable. Reference real project names, email subjects, and decision titles from the data."""
+Reference specific names and numbers from the data."""
 
     digest_text = call_llm(
         system=DIGEST_SYSTEM,
         user=prompt,
-        max_tokens=2500,
+        max_tokens=1000,
         temperature=0.6,
-        thinking=True,
+        thinking=False,
+        model="meta/llama-3.1-8b-instruct",
     )
 
     return {

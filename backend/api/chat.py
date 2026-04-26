@@ -184,6 +184,7 @@ def chat(payload: dict, session: Session = Depends(get_session)):
             system=CHAT_SYSTEM,
             user=f"[Live org snapshot]\n{org_context}\n\n---\n\n{user_message}",
             max_tokens=1024,
+            model="meta/llama-3.1-8b-instruct",
         )
         return PlainTextResponse(answer)
     except Exception as e:
@@ -207,5 +208,6 @@ def quick_answer(payload: dict, session: Session = Depends(get_session)):
         system=CHAT_SYSTEM,
         user=f"Org context:\n{org_context}\n\nQuestion: {question}\n\nGive a concise answer in 1-3 sentences.",
         max_tokens=256,
+        model="meta/llama-3.1-8b-instruct",
     )
     return {"answer": answer}
