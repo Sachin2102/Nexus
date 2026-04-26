@@ -20,7 +20,7 @@
 
 > *An AI Chief of Staff that autonomously runs your organization's operations*
 
-NEXUS handles the class of organizational tasks people traditionally believe AI cannot do — sensitive email triage, meeting preparation, project risk assessment, and decision routing — all with minimal human touch. It's not a chatbot. It's an **autonomous agent system** that takes action.
+NEXUS handles the class of organizational tasks people traditionally believe AI cannot do, such as sensitive email triage, meeting preparation, project risk assessment, and decision routing, all with minimal human touch. It's not a chatbot. It's an **autonomous agent system** that takes action.
 
 ---
 
