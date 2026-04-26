@@ -38,35 +38,7 @@ Traditional tools automate processes. NEXUS applies **AI judgment** to replace t
 ---
 
 ## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         NEXUS                               │
-│                                                             │
-│  ┌──────────┐   ┌──────────────────────────────────────┐    │
-│  │ Next.js  │   │          LangGraph Orchestrator      │    │
-│  │ Frontend │◄──│                                      │    │
-│  │          │   │  ┌────────┐  ┌─────────┐             │    │
-│  │ Dashboard│   │  │ Email  │  │ Meeting │             │    │
-│  │ Inbox    │   │  │ Agent  │  │ Agent   │             │    │
-│  │ Meetings │   │  └────────┘  └─────────┘             │    │
-│  │ Projects │   │  ┌────────┐  ┌──────────┐            │    │
-│  │ Decisions│   │  │Project │  │ Decision │            │    │
-│  └──────────┘   │  │Sentinel│  │  Agent   │            │    │
-│       │         │  └────────┘  └──────────┘            │    │
-│       │ REST    └──────────────────────────────────────┘    │
-│       │ WebSocket      │                                    │
-│  ┌────▼────────────────▼──────────────────────────────┐     │
-│  │             FastAPI Backend                        │     │
-│  │   SQLite DB · ChromaDB Vector Store                │     │
-│  └────────────────────────────────────────────────────┘     │
-│                         │                                   │
-│              ┌──────────▼────────────┐                      │
-│              │    NVIDIA NIM         │                      │
-│              │  DeepSeek V4 Flash    │                      │
-│              └───────────────────────┘                      │
-└─────────────────────────────────────────────────────────────┘
-```
+<img src="docs/Architecture.png"/>
 
 ### Agent Architecture (LangGraph)
 
