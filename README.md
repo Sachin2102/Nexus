@@ -108,7 +108,7 @@ Each agent has:
 ### Project Sentinel — Detail Panel
 > Clicking any project slides in the full intelligence panel: task and milestone progress, budget utilisation, AI recommendation, risk flags with actions, blockers, and the latest status update.
 
-<img src="docs/project2.png" width="800" alt="NEXUS Project Sentinel — SOC 2 detail panel with risk flags and AI recommendation" />
+<img src="docs/project3.png" width="800" alt="NEXUS Project Sentinel — SOC 2 detail panel with risk flags and AI recommendation" />
 
 ---
 
