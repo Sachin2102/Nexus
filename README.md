@@ -3,7 +3,7 @@
 # 🧠 NEXUS
 ### Autonomous AI Chief of Staff
 
-*An agentic system that autonomously manages organizational workflows — triaging emails, preparing meeting briefs, monitoring project health, and routing decisions — with minimal human intervention*
+*An agentic system that autonomously manages organizational workflows, triaging emails, preparing meeting briefs, monitoring project health, and routing decisions with minimal human intervention*
 
 ![Python](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
