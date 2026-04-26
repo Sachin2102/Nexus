@@ -105,10 +105,11 @@ Each agent has:
 
 <img src="docs/project.png" width="100%" alt="NEXUS Project Sentinel — health overview" />
 
+
 ### Project Sentinel — Detail Panel
 > Clicking any project slides in the full intelligence panel: task and milestone progress, budget utilisation, AI recommendation, risk flags with actions, blockers, and the latest status update.
 
-<img src="docs/project2.png" width="800" alt="NEXUS Project Sentinel — SOC 2 detail panel with risk flags and AI recommendation" />
+<img src="docs/project3.png" width="800" alt="NEXUS Project Sentinel — SOC 2 detail panel with risk flags and AI recommendation" />
 
 ---
 
@@ -131,11 +132,11 @@ Each agent has:
 ### Ask NEXUS — Floating AI Assistant
 > A persistent chat widget with live org context loaded. Four quick-question prompts get you instant situational awareness without typing.
 
-<img src="docs/chat.png" width="100%" alt="Ask NEXUS floating chat widget with quick question suggestions" />
+<img src="docs/chat3.png" width="100%" alt="Ask NEXUS floating chat widget with quick question suggestions" />
 
 > In conversation: NEXUS cross-references emails, projects, and decisions to give a prioritised answer — not a generic one.
 
-<img src="docs/chat2.png" width="100%" alt="Ask NEXUS AI response — cross-referencing live org data to prioritise critical production outage" />
+<img src="docs/chat4.png" width="100%" alt="Ask NEXUS AI response — cross-referencing live org data to prioritise critical production outage" />
 
 ---
 
