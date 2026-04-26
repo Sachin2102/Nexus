@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import {
   FileText, Loader2, Sparkles, Copy, CheckCircle2,
-  Mail, CalendarDays, FolderKanban, GitBranch, Zap,
+  Mail, CalendarDays, GitBranch, Zap,
 } from 'lucide-react'
 
 interface DigestStats {
@@ -17,50 +17,85 @@ interface DigestStats {
   nexus_actions: number
 }
 
-interface DigestData {
-  digest: string
-  generated_at: string
-  stats: DigestStats
-}
-
 export default function DigestPage() {
-  const [data, setData]       = useState<DigestData | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [copied, setCopied]   = useState(false)
-  const [error, setError]     = useState<string | null>(null)
+  const [stats, setStats]           = useState<DigestStats | null>(null)
+  const [digestText, setDigestText] = useState('')
+  const [generatedAt, setGeneratedAt] = useState<string>('')
+  const [loading, setLoading]       = useState(false)   // waiting for first chunk
+  const [streaming, setStreaming]   = useState(false)   // text is actively streaming
+  const [copied, setCopied]         = useState(false)
+  const [error, setError]           = useState<string | null>(null)
 
   const generate = async () => {
     setLoading(true)
+    setStreaming(false)
+    setStats(null)
+    setDigestText('')
     setError(null)
+
     try {
       const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const res  = await fetch(`${BACKEND}/api/digest/generate`, { method: 'POST' })
-      if (!res.ok) {
+      const res = await fetch(`${BACKEND}/api/digest/generate`, { method: 'POST' })
+
+      if (!res.ok || !res.body) {
         const text = await res.text()
         setError(`Backend error ${res.status}: ${text}`)
         return
       }
-      const json = await res.json()
-      if (!json.stats) {
-        setError('Unexpected response from backend. Check the backend terminal for errors.')
-        return
+
+      const reader  = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer         = ''
+      let statsExtracted = false
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+
+        if (!statsExtracted) {
+          buffer += chunk
+          const endIdx = buffer.indexOf('__END_STATS__')
+          if (endIdx !== -1) {
+            const startIdx = buffer.indexOf('__STATS__')
+            if (startIdx !== -1) {
+              const jsonStr = buffer.slice(startIdx + 9, endIdx)
+              try {
+                const parsed = JSON.parse(jsonStr)
+                setStats(parsed)
+                setGeneratedAt(new Date().toISOString())
+              } catch {
+                setError('Could not parse stats from response.')
+                return
+              }
+            }
+            // Everything after __END_STATS__\n is the digest text
+            const remainder = buffer.slice(endIdx + 13).replace(/^\n/, '')
+            if (remainder) setDigestText(remainder)
+            statsExtracted = true
+            setLoading(false)
+            setStreaming(true)
+          }
+        } else {
+          setDigestText(prev => prev + chunk)
+        }
       }
-      setData(json)
     } catch (e: any) {
       setError('Could not reach backend. Make sure it is running on port 8000.')
     } finally {
       setLoading(false)
+      setStreaming(false)
     }
   }
 
   const copy = () => {
-    if (!data) return
-    navigator.clipboard.writeText(data.digest)
+    if (!digestText) return
+    navigator.clipboard.writeText(digestText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Render markdown-like digest (simple conversion)
   const renderDigest = (text: string) => {
     return text.split('\n').map((line, i) => {
       if (line.startsWith('## ')) {
@@ -89,6 +124,8 @@ export default function DigestPage() {
     })
   }
 
+  const hasContent = stats !== null
+
   return (
     <div className="max-w-3xl mx-auto space-y-5 animate-fade-in">
       {/* Header */}
@@ -100,7 +137,7 @@ export default function DigestPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {data && (
+          {digestText && (
             <button onClick={copy} className="btn-ghost text-xs">
               {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Copied!' : 'Copy'}
@@ -108,18 +145,18 @@ export default function DigestPage() {
           )}
           <button
             onClick={generate}
-            disabled={loading}
+            disabled={loading || streaming}
             className="btn-primary disabled:opacity-60"
           >
-            {loading
-              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...</>
+            {loading || streaming
+              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {loading ? 'Analysing...' : 'Writing...'}</>
               : <><Sparkles className="w-3.5 h-3.5" /> Generate Digest</>
             }
           </button>
         </div>
       </div>
 
-      {/* Error state */}
+      {/* Error */}
       {error && !loading && (
         <div className="card border border-red-500/30 bg-red-500/5 p-5 flex items-start gap-3">
           <span className="text-red-400 text-lg">⚠️</span>
@@ -131,39 +168,10 @@ export default function DigestPage() {
       )}
 
       {/* Empty state */}
-      {!data && !loading && !error && (
+      {!hasContent && !loading && !error && (
         <div className="card flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
             <FileText className="w-7 h-7 text-indigo-400" />
           </div>
           <h2 className="text-sm font-semibold text-white mb-2">No digest generated yet</h2>
-          <p className="text-xs text-slate-500 max-w-xs mb-5">
-            NEXUS will analyse all emails, projects, meetings, and decisions to write
-            your weekly executive briefing.
-          </p>
-          <button onClick={generate} className="btn-primary">
-            <Sparkles className="w-3.5 h-3.5" /> Generate Now
-          </button>
-        </div>
-      )}
-
-      {/* Loading */}
-      {loading && (
-        <div className="card flex flex-col items-center justify-center py-20 text-center">
-          <Loader2 className="w-10 h-10 text-indigo-400 animate-spin mb-4" />
-          <p className="text-sm font-medium text-white mb-1">Analysing your organisation...</p>
-          <p className="text-xs text-slate-500">NEXUS is reading emails, projects, decisions, and meetings</p>
-        </div>
-      )}
-
-      {/* Stats strip */}
-      {data && (
-        <>
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { icon: Mail,         label: 'Emails handled',     value: data.stats.emails_handled },
-              { icon: CalendarDays, label: 'Meetings processed', value: data.stats.meetings_completed },
-              { icon: GitBranch,    label: 'Decisions resolved', value: data.stats.decisions_resolved },
-              { icon: Zap,          label: 'Automation rate',    value: `${data.stats.automation_rate}%` },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="card p
+          <p className="text-xs text-slate-500 max-w-xs m

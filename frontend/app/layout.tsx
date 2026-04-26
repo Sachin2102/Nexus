@@ -4,6 +4,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import TopBar from '@/components/layout/TopBar'
 import AskNexus from '@/components/AskNexus'
 import CommandBar from '@/components/CommandBar'
+import LoadingScreen from '@/components/LoadingScreen'
 
 export const metadata: Metadata = {
   title: 'NEXUS — AI Chief of Staff',
@@ -23,8 +24,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         {/* Global interactive components */}
         <AskNexus />
-        <CommandBar />
-      </body>
-    </html>
-  )
-}
