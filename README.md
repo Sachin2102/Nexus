@@ -143,7 +143,7 @@ Each agent has:
 ## Demo
 
 > *Record a short walkthrough and paste your YouTube link here*
-<!-- [![NEXUS Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID) -->
+<!-- [![NEXUS Demo]([https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID](https://youtu.be/25n4Kv7HWWQ)) -->
 
 ---
 
